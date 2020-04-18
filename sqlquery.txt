@@ -1,0 +1,29 @@
+select	b.business [Business], 
+		isnull(p.streetno, '') [Streetno]
+		, p.street [Street]
+		, p.postcode [PostCode]
+		, sum(isnull(f.[count],0)) [FootfallCount]  
+from businesses b  (nolock)
+	inner join permises p (nolock)  on b.id = p.businessid
+	left join football f (nolock) on p.id = f.permisesid 
+group by b.business, p.streetno, p.street, p.postcode
+
+
+
+
+
+select b.Business
+	, isnull(p.StreetNo, '') StreeNo
+	, p.Street, p.PostCode
+	, isnull(t.Count,0) FootfallCount  
+from Premises p (nolock) inner join Businesses b (nolock)
+	on p.BusinessId = b.id
+left join
+(
+	select 
+		PremisesId
+		, sum(count) count 
+	from Footfall (nolock)
+	group by PremisesId
+) t
+on p.id = t.PremisesId
