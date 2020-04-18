@@ -13,6 +13,7 @@ namespace StringProcessor.Tests
     {
         private string inputString;
         StringProcessorValidator validator;
+        ICollection<string> collection = new List<string>();
 
         [SetUp]
         public void Init()
@@ -41,11 +42,15 @@ namespace StringProcessor.Tests
         [Test]
         public void StringCollectionProcessor_Test()
         {
-            ICollection<string> collection = new List<string>();
-            collection.Add("WWW_4$");
-            collection.Add("_4");
-            collection.Add("AAAc91%cWwWkLq$1ci3_848v3d__K");
-            collection.Add("848");
+
+
+            //return will always return 15 chars
+            collection.Add("AAAc91%cWwWkLq$1ci3_848v3d__KXXXX");
+            collection.Add("_WWW4_b$");
+            collection.Add("$$$$$");
+            collection.Add("___WWWx&&");
+            collection.Add("44WWWx&&");
+            collection.Add("44");
 
 
             Dictionary<string, string> charsToReplace = new Dictionary<string, string>()
@@ -57,78 +62,107 @@ namespace StringProcessor.Tests
 
             StringCollectionProcessor collectionProcessor = new StringCollectionProcessor(charsToReplace);
             var result = collectionProcessor.Process(collection);
-            Assert.IsTrue(result.FirstOrDefault() == "W£");
 
-            Assert.IsTrue(result.ToArray()[1] == "Ac91%cWwWkLq£1c");
-            Assert.IsTrue(result.ToArray()[2] == "8");
-            //Ac91%cWwWkLq£1c
-            //Ac91%cWwWkLq£1c
+            Assert.IsTrue(ShouldReturnMaximumOf15Characters(result.ToArray()[0]));
+            Assert.IsTrue(ShouldReduceToSingleCharacter_WhenSameCaseContiguousDuplicateCharacters(result.ToArray()[1]));
+            Assert.IsTrue(ShouldReplaceDollarSignWithPoundSign(result.ToArray()[2]));
+            Assert.IsTrue(ShouldRemoveUnderscore(result.ToArray()[3]));
+            Assert.IsTrue(ShouldRemoveNumberFour(result.ToArray()[4]));
         }
 
-
-
-        [Test]
-        public void Input_ShouldNotBeNull()
+        public bool ShouldReturnMaximumOf15Characters(string input)
         {
-            Assert.Throws(
-                Is.TypeOf<Exception>().And.Message.EqualTo("Input string should not be null."),
-                delegate { validator.Process(null); });
+            return input.Length <= 15;
         }
 
-        [Test]
-        public void Output_ShouldNotBeNullOrEmpty()
+        public bool ShouldReduceToSingleCharacter_WhenSameCaseContiguousDuplicateCharacters(string input)
         {
-            Assert.Throws(
-                Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
-                delegate { validator.Process("_"); });
+            return input == "Wb£";
         }
 
-        [Test]
-        public void Output_ShouldReturnMaximumOf15Characters()
+        public bool ShouldReplaceDollarSignWithPoundSign(string input)
         {
-            var result = validator.Process("SWASWQEWSvsfaTGsggaUIJPppou$3((76%__");
-            Assert.IsTrue(result.Length <= 15);
+            return input == "£";
         }
 
-        [Test]
-        public void Output_ShouldReduceToSingleCharacter_WhenSameCaseContiguousDuplicateCharacters()
+        public bool ShouldRemoveUnderscore(string input)
         {
-            var result = validator.Process(@"WWWxWWW");
-            Assert.AreEqual(@"WxW", result);
+            return input == "Wx&";
         }
 
-        [Test]
-        public void Output_ShouldReplaceDollarSignWithPoundSign()
+        public bool ShouldRemoveNumberFour(string input)
         {
-            var result = validator.Process(@"$$$$$");
-            Assert.AreEqual(@"£", result);
+            return input == "Wx&";
         }
 
-        [Test]
-        public void Output_ShouldRemoveUnderscore()
-        {
-            Assert.Throws(
-                Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
-                delegate { validator.Process(@"___"); });
-
-            var result = validator.Process(@"___WWWx&&");
-            Assert.AreEqual(@"Wx&", result);
+        //public bool ShouldNotBeNull(string input)
+        //{
+        //    return string.IsNullOrEmpty(input);
+        //}
 
 
-        }
 
-        [Test]
-        public void Output_ShouldRemoveNumberFour()
-        {
-            Assert.Throws(
-                Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
-                delegate { validator.Process(@"44"); });
+        //public void Input_ShouldNotBeNull(string input)
+        //{
+        //    Assert.Throws(
+        //        Is.TypeOf<Exception>().And.Message.EqualTo("Input string should not be null."),
+        //        delegate { validator.Process(input); });
+        //}
 
-            var result = validator.Process(@"44WWWx&&");
-            Assert.AreEqual(@"Wx&", result);
+        //[Test]
+        //public void Output_ShouldNotBeNullOrEmpty()
+        //{
+        //    Assert.Throws(
+        //        Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
+        //        delegate { validator.Process("_"); });
+        //}
+
+        //[Test]
+        //public void Output_ShouldReturnMaximumOf15Characters()
+        //{
+        //    var result = validator.Process("SWASWQEWSvsfaTGsggaUIJPppou$3((76%__");
+        //    Assert.IsTrue(result.Length <= 15);
+        //}
+
+        //[Test]
+        //public void Output_ShouldReduceToSingleCharacter_WhenSameCaseContiguousDuplicateCharacters()
+        //{
+        //    var result = validator.Process(@"WWWxWWW");
+        //    Assert.AreEqual(@"WxW", result);
+        //}
+
+        //[Test]
+        //public void Output_ShouldReplaceDollarSignWithPoundSign()
+        //{
+        //    var result = validator.Process(@"$$$$$");
+        //    Assert.AreEqual(@"£", result);
+        //}
+
+        //[Test]
+        //public void Output_ShouldRemoveUnderscore()
+        //{
+        //    Assert.Throws(
+        //        Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
+        //        delegate { validator.Process(@"___"); });
+
+        //    var result = validator.Process(@"___WWWx&&");
+        //    Assert.AreEqual(@"Wx&", result);
 
 
-        }
+        //}
+
+        //[Test]
+        //public void Output_ShouldRemoveNumberFour()
+        //{
+        //    Assert.Throws(
+        //        Is.TypeOf<Exception>().And.Message.EqualTo("Ouputput string cannot be null or empty"),
+        //        delegate { validator.Process(@"44"); });
+
+        //    var result = validator.Process(@"44WWWx&&");
+        //    Assert.AreEqual(@"Wx&", result);
+
+
+        //}
 
 
 
