@@ -1,5 +1,4 @@
-#Local Data Company Test
-#SQL Test
+#SQL Test - LocalData Company Test
 #---------------------------------------------------------------
 Given the following tables, write a query which returns the total 
 footfall count per premises. The resultset should contain the 
